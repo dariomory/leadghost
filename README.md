@@ -1,3 +1,5 @@
+![leadghost](images/logo.jpeg)
+
 # LeadGhost
 
 [![PyPI version](https://img.shields.io/pypi/v/leadghost.svg)](https://pypi.org/project/leadghost/)
