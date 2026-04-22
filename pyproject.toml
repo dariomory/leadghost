@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "leadghost"
+version = "0.1.0"
+description = "A LinkedIn lead generation automation tool"
+readme = "README.md"
+authors = [
+  {name = "Dario Mory", email = "dario@mory.dev"}
+]
+maintainers = [
+  {name = "Dario Mory", email = "dario@mory.dev"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+license = {text = "Apache-2.0"}
+dependencies = [
+  "beautifulsoup4>=4.8.2",
+  "chromedriver-autoinstaller",
+  "dnspython",
+  "pandas>=1.0.1",
+  "rich>=6.1.1",
+  "selenium>=3.141.0",
+  "tldextract",
+  "typer>=0.9.0",
+]
+requires-python = ">= 3.10"
+
+[dependency-groups]
+dev = [
+    { include-group = "lint" },
+    { include-group = "test" },
+]
+lint = [
+    "ruff",
+]
+test = [
+    "coverage",
+    "pytest",
+]
+
+[project.urls]
+bugs = "https://github.com/dariomory/leadghost/issues"
+changelog = "https://github.com/dariomory/leadghost/releases"
+documentation = "https://github.com/dariomory/leadghost#readme"
+homepage = "https://github.com/dariomory/leadghost"
+
+[project.scripts]
+leadghost = "leadghost.cli:app"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src/", "tests/"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 50
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+    "@overload",
+    "@typing.overload",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+    "raise NotImplementedError",
+    "\\.\\.\\.",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/leadghost"]
+
+[tool.uv]
+package = true
+default-groups = ["dev"]

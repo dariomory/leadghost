@@ -13,9 +13,9 @@ from rich import pretty
 from rich.console import Console
 from rich.progress import track
 from selenium import webdriver
-from SeleniumBot import SeleniumBot
-from email_generator.EmailGenerator import EmailGenerator
-from utils import generate_md5
+from leadghost.selenium_bot import SeleniumBot
+from leadghost.email_generator.EmailGenerator import EmailGenerator
+from leadghost.utils import generate_md5
 
 __NAME__ = 'LeadMonster'
 __VERSION__ = '1.3'

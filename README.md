@@ -1,44 +1,145 @@
 ![leadghost](images/logo.jpeg)
 
-### Instructions
-1. Open LeadMonster.exe
+# LeadGhost
 
-2. Enter search keyword + location.
+[![PyPI version](https://img.shields.io/pypi/v/leadghost.svg)](https://pypi.org/project/leadghost/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-3. Enter number of jobs to scrape.
+A LinkedIn lead generation automation tool for scraping job postings and extracting lead information.
 
-4. Log in (once) to any Sales Navigator account.
+> **⚠️ WARNING:** This tool interacts with LinkedIn's services. Users are responsible for ensuring their use complies with LinkedIn's [Terms of Service](https://www.linkedin.com/legal/user-agreement), [Robots.txt](https://www.linkedin.com/robots.txt), and any applicable laws and regulations. The authors of this tool are not responsible for any misuse, account restrictions, or legal consequences resulting from its use. Use at your own risk.
 
-5. Fine-tune the search as needed, then click "Run LeadMonster" to begin the process.
+- GitHub: [https://github.com/dariomory/leadghost/](https://github.com/dariomory/leadghost/)
+- PyPI package: [https://pypi.org/project/leadghost/](https://pypi.org/project/leadghost/)
+- Created by: **[Dario Mory](https://mory.dev)** | GitHub [https://github.com/dariomory](https://github.com/dariomory)
+- Free software: Apache License 2.0
 
-### Blacklist companies
-Enter company names in `blacklist.txt` to exclude companies.
+## Features
 
-### Automatic mode
-In `config.txt`, enable automatic with `auto_mode = True`. LeadMonster will now use the `auto.csv` file.
+- **Automated lead extraction**: Scrape LinkedIn job postings and extract company information
+- **Email generation**: Automatically generate and validate potential email addresses for leads
+- **Configurable filtering**: Blacklist companies, set company size limits, and filter by keywords
+- **Automatic mode**: Run scheduled jobs using CSV configuration files
+- **Human-like behavior**: Configurable random delays to avoid detection
 
-### How to schedule on Windows
-Make sure automatic mode is enabled, as shown above. Go to `Task Scheduler`, right click on `Task Scheduler Library` and click `New Task`. 
+## Installation
 
-![task](images/task.png)
+```bash
+pip install leadghost
+```
 
-Under `Actions` select the .exe location:
+Or install with [uv](https://github.com/astral-sh/uv):
 
-![exe](images/exe.png)
+```bash
+uv pip install leadghost
+```
 
-Select your desired schedule under `Triggers`:
+## Usage
 
-![triggers](images/triggers.png)
+### Quick Start
 
+After installation, run the CLI:
+
+```bash
+leadghost run
+```
+
+### Interactive Mode
+
+1. Run `leadghost run` to start the tool
+2. Enter search keyword and location when prompted
+3. Enter the number of jobs to scrape
+4. Log in to your LinkedIn account (if not already logged in)
+5. The tool will scrape job postings and extract lead information
+
+### Automatic Mode
+
+Configure `config.txt`:
+
+```ini
+[leadmonster]
+auto_mode = True
+max_leads_per_company = 5
+max_random_delay = 5
+```
+
+Create `auto.csv` with your search configurations:
+
+```csv
+search,location,keywords,max_company_size,job_count,date_filter
+"software engineer","San Francisco","developer,engineer",500,100,weekly
+"marketing manager","New York","marketing,seo",200,50,daily
+```
+
+Then run:
+
+```bash
+leadghost run
+```
+
+### Blacklisting Companies
+
+Enter company names in `blacklist.txt` (one per line) to exclude them from results:
+
+```
+Microsoft
+Intel
+Pioneer Square
+```
 
 ### Settings
-`max_leads_per_company`
 
-The maximum number of leads per company.
+- `max_leads_per_company`: Maximum number of leads to extract per company
+- `max_random_delay`: Random delay (in seconds) between page navigations to avoid detection
 
-`max_random_delay`
+### Scheduling on Windows
 
-A random delay (in seconds) between page to page. This is optional but can be useful for longer scrapes.
+With automatic mode enabled, use Windows Task Scheduler:
 
+1. Open `Task Scheduler`
+2. Right-click on `Task Scheduler Library` → `New Task`
+3. Under `Actions`, select the `leadghost` executable location
+4. Set your desired schedule under `Triggers`
 
-![run](images/run.png)
+## Development
+
+To set up for local development:
+
+```bash
+# Clone the repository
+git clone git@github.com:dariomory/leadghost.git
+cd leadghost
+
+# Install in editable mode with uv
+uv sync
+```
+
+This installs the package in development mode with all dependencies.
+
+Run tests:
+
+```bash
+uv run pytest
+```
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Code of Conduct
+
+This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## Disclaimer
+
+This tool is provided for educational and research purposes only. Users are responsible for:
+- Complying with LinkedIn's Terms of Service
+- Obtaining proper consent before contacting leads
+- Ensuring compliance with applicable data protection laws (GDPR, CCPA, etc.)
+- Using the tool in an ethical and legal manner
+
+The authors assume no liability for any misuse of this software.
