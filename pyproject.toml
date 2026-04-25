@@ -28,7 +28,9 @@ dependencies = [
   "beautifulsoup4>=4.8.2",
   "chromedriver-autoinstaller",
   "dnspython",
+  "numpy",
   "pandas>=1.0.1",
+  "pillow",
   "rich>=6.1.1",
   "selenium>=3.141.0",
   "tldextract",
@@ -40,6 +42,7 @@ requires-python = ">= 3.10"
 dev = [
     { include-group = "lint" },
     { include-group = "test" },
+    { include-group = "typecheck" },
 ]
 lint = [
     "ruff",
@@ -47,6 +50,9 @@ lint = [
 test = [
     "coverage",
     "pytest",
+]
+typecheck = [
+    "ty",
 ]
 
 [project.urls]
