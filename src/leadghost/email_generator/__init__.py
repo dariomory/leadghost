@@ -2,7 +2,7 @@
 
 from .EmailGenerator import EmailGenerator, get_first_and_last_name
 from .generator import generate_emails
-from .validator import check_email, get_records, check_catchall
+from .validator import check_catchall, check_email, get_records
 
 __all__ = [
     "EmailGenerator",

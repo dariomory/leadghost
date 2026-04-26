@@ -1,37 +1,25 @@
-import json
 import os
+import random
+import re
+import time
+from typing import Any
+
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.common.exceptions import (
     NoSuchElementException,
-    MoveTargetOutOfBoundsException,
-    WebDriverException,
-    NoSuchFrameException,
+    TimeoutException,
 )
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait, Select
-import time
-import random
-import sys
-import numpy as np
-from glob import glob
-from hashlib import md5
-from PIL import Image
-import html
-import re
-from urllib.parse import urlparse, urljoin, parse_qs
-from os.path import sep
-import zipfile
-import pickle
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
 
 class SeleniumBot:
-    driver = None
-    captcha_client = None
+    driver: Any = None
+    captcha_client: Any = None
 
     DEV_SETTINGS = None
     COOKIES_PROFILE = None
@@ -67,7 +55,7 @@ class SeleniumBot:
         if check:
             try:
                 requests.get(page, timeout=8)
-            except:
+            except Exception:
                 return
         if timeout:
             self.driver.set_page_load_timeout(timeout)
@@ -92,6 +80,9 @@ class SeleniumBot:
     def reload(self):
         self.driver.refresh()
 
+    def save_cookies(self):
+        pass
+
     def close(self):
         if self.COOKIES_PROFILE:
             self.save_cookies()
@@ -100,9 +91,15 @@ class SeleniumBot:
     def script(self, script, *args):
         return self.driver.execute_script(script, *args)
 
-    def css(self, selector, node=None, getall=False, attr=None,
-            wait=None, wait_for=None,
-            ):
+    def css(
+        self,
+        selector,
+        node=None,
+        getall=False,
+        attr=None,
+        wait=None,
+        wait_for=None,
+    ):
 
         if wait:
             w = self.wait_show_element(selector, wait=wait)
@@ -140,22 +137,22 @@ class SeleniumBot:
         return el
 
     def get_attr(self, el, attr):
-        if type(attr) == list:
+        if isinstance(attr, list):
             output = []
             for a in attr:
-                if a == 'text':
+                if a == "text":
                     output.append(el.text)
                 else:
                     output.append(el.get_attribute(a))
         else:
-            if attr == 'text':
+            if attr == "text":
                 output = el.text
             else:
                 output = el.get_attribute(attr)
         return output
 
     def extract_attributes(self, el, attr):
-        if type(el) == list:
+        if isinstance(el, list):
             return [self.get_attr(i, attr) for i in el]
         else:
             return self.get_attr(el, attr)
@@ -167,8 +164,8 @@ class SeleniumBot:
             return None
 
     def contains_regex(self, regex):
-        page_text = self.css('body').text
-        if re.findall(rf'{regex}', page_text):
+        page_text = self.css("body").text
+        if re.findall(rf"{regex}", page_text):
             return True
         else:
             return False
@@ -182,10 +179,9 @@ class SeleniumBot:
 
     def wait_page_load(self):
         while True:
-            page_state = self.script(
-                'return document.readyState;')
+            page_state = self.script("return document.readyState;")
             self.driver.implicitly_wait(1)
-            if page_state == 'complete':
+            if page_state == "complete":
                 break
         return
 
@@ -194,14 +190,14 @@ class SeleniumBot:
             wait = WebDriverWait(self.driver, wait)
             element = wait.until(EC.presence_of_element_located((By.XPATH, f'//*[contains(text(), "{text}")]')))
             return element
-        except:
+        except Exception:
             return None
 
     def wait_for_regex(self, regex):
         while True:
             if self.contains_regex(regex):
                 return True
-            time.sleep(.5)
+            time.sleep(0.5)
 
     def wait_for_element(self, selector, xpath=False, wait=99999):
         try:
@@ -211,7 +207,7 @@ class SeleniumBot:
             else:
                 element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
             return element
-        except:
+        except Exception:
             return None
 
     def wait_show_element(self, selector, xpath=False, wait=99999):
@@ -222,7 +218,7 @@ class SeleniumBot:
             else:
                 element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, selector)))
             return element
-        except:
+        except Exception:
             return None
 
     def wait_hide_element(self, selector, wait):
@@ -230,7 +226,7 @@ class SeleniumBot:
             wait = WebDriverWait(self.driver, wait)
             element = wait.until(EC.invisibility_of_element_located((By.CSS_SELECTOR, selector)))
             return element
-        except:
+        except Exception:
             return None
 
     def wait_click_element(self, selector, wait):
@@ -238,7 +234,7 @@ class SeleniumBot:
             wait = WebDriverWait(self.driver, wait)
             element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, selector)))
             return element
-        except:
+        except Exception:
             return None
 
     def element_is_present(self, selector):
@@ -250,7 +246,7 @@ class SeleniumBot:
 
     def verify_element_present(self, selector):
         if not self.element_is_present(selector):
-            raise Exception('Element %s not found' % selector)
+            raise Exception(f"Element {selector} not found")
 
     def get_element_from(self, fromObject, selector, xpath=False):
         try:
@@ -295,27 +291,30 @@ class SeleniumBot:
         return None
 
     def get_parent_levels(self, node, levels):
-        path = '..'
+        path = ".."
         if levels > 1:
-            for i in range(1, levels):
-                path = path + '/..'
+            for _i in range(1, levels):
+                path = path + "/.."
         return node.find_element_by_xpath(path)
 
     def get_parent_node(self, node):
-        return node.find_element_by_xpath('..')
+        return node.find_element_by_xpath("..")
 
     def get_child_nodes(self, node):
-        return node.find_elements_by_xpath('./*')
+        return node.find_elements_by_xpath("./*")
 
-    def write(self, field, text,
-              css=False,
-              xpath=False,
-              name=False,
-              wait=False,
-              clear=False,
-              human=False,
-              submit=False,
-              ):
+    def write(
+        self,
+        field,
+        text,
+        css=False,
+        xpath=False,
+        name=False,
+        wait=False,
+        clear=False,
+        human=False,
+        submit=False,
+    ):
 
         if wait:
             self.wait_show_element(field, wait=self.WAIT, xpath=xpath)
@@ -329,9 +328,9 @@ class SeleniumBot:
 
         if clear:
             if human:
-                while field.get_attribute('value') != '':
+                while field.get_attribute("value") != "":
                     field.send_keys(Keys.BACKSPACE)
-                    time.sleep(random.uniform(.05, .1))
+                    time.sleep(random.uniform(0.05, 0.1))
                 self.random_sleep()
             else:
                 field.clear()
@@ -339,11 +338,11 @@ class SeleniumBot:
         if human:
             for letter in text:
                 field.send_keys(letter)
-                time.sleep(random.uniform(.05, .2))
+                time.sleep(random.uniform(0.05, 0.2))
         else:
             try:
                 field.send_keys(text)
-            except:
+            except Exception:
                 self.driver.execute_script(f'arguments[0].value = "{text}"', field)
 
         if submit:
@@ -358,16 +357,17 @@ class SeleniumBot:
         field_object.send_keys(Keys.RETURN)
         return field_object
 
-    def click(self,
-              element,
-              wait=False,
-              css=False,
-              xpath=False,
-              js_click=False,
-              sleep=False,
-              double=False,
-              new_tab=False,
-              ):
+    def click(
+        self,
+        element,
+        wait=False,
+        css=False,
+        xpath=False,
+        js_click=False,
+        sleep=False,
+        double=False,
+        new_tab=False,
+    ):
 
         if wait:
             w = self.wait_show_element(element, wait=wait, xpath=xpath)
@@ -383,7 +383,7 @@ class SeleniumBot:
             element = self.xpath(element)
 
         if new_tab:
-            src = element.get_attribute('src')
+            src = element.get_attribute("src")
             self.driver.execute_script(f'window.open("{src}", "_blank")')
 
         if double:
@@ -399,15 +399,17 @@ class SeleniumBot:
                 actions.click(element)
                 actions.perform()
                 return element
-            except:
+            except Exception:
                 try:
-                    script = ("var viewPortHeight = Math.max("
-                              "document.documentElement.clientHeight, window.innerHeight || 0);"
-                              "var elementTop = arguments[0].getBoundingClientRect().top;"
-                              "window.scrollBy(0, elementTop-(viewPortHeight/2));")
+                    script = (
+                        "var viewPortHeight = Math.max("
+                        "document.documentElement.clientHeight, window.innerHeight || 0);"
+                        "var elementTop = arguments[0].getBoundingClientRect().top;"
+                        "window.scrollBy(0, elementTop-(viewPortHeight/2));"
+                    )
                     self.driver.execute_script(script)  # parent = the webdriver
                     element.click()
-                except:
+                except Exception:
                     # try `execute_script` as a last resort
                     self.script("arguments[0].click();", element)
                     return element
@@ -416,24 +418,24 @@ class SeleniumBot:
         found_checkbox = False
         checkboxes = self.css(selector, getall=True)
         for checkbox in checkboxes:
-            if checkbox.get_attribute('name') == name:
+            if checkbox.get_attribute("name") == name:
                 found_checkbox = True
                 if not deselect and not checkbox.is_selected():
                     checkbox.click()
                 if deselect and checkbox.is_selected():
                     checkbox.click()
         if not found_checkbox:
-            raise Exception('Checkbox %s not found.' % name)
+            raise Exception(f"Checkbox {name} not found.")
 
     def select_option(self, selector, value):
         found_option = False
         options = self.css(selector, getall=True)
         for option in options:
-            if option.get_attribute('value') == str(value):
+            if option.get_attribute("value") == str(value):
                 found_option = True
                 option.click()
         if not found_option:
-            raise Exception('Option %s not found' % (value))
+            raise Exception(f"Option {value} not found")
 
     def select_dropdown(self, value, xpath=False):
         if xpath:
@@ -446,13 +448,13 @@ class SeleniumBot:
         options = self.css(selector)
         for option in options:
             if option.is_selected():
-                return option.get_attribute('value')
+                return option.get_attribute("value")
 
     def is_option_selected(self, selector, value):
         options = self.css(selector)
         for option in options:
-            if option.is_selected() != (value == option.get_attribute('value')):
-                print(option.get_attribute('value'))
+            if option.is_selected() != (value == option.get_attribute("value")):
+                print(option.get_attribute("value"))
                 return False
         return True
 
@@ -471,16 +473,18 @@ class SeleniumBot:
     def check_title(self, title):
         return self.driver.title == title
 
-    def save_screenshot(self, path=f"{str(int(time.time()))}.png"):
+    def save_screenshot(self, path: str | None = None):
+        if path is None:
+            path = f"{str(int(time.time()))}.png"
         self.driver.save_screenshot(path)
 
     def scroll_up(self, y=100):
-        scroll = self.driver.execute_script('return document.documentElement.scrollTop')
-        self.driver.execute_script(f'scrollTo(0, {scroll - y})')
+        scroll = self.driver.execute_script("return document.documentElement.scrollTop")
+        self.driver.execute_script(f"scrollTo(0, {scroll - y})")
 
     def scroll_down(self, y=400):
-        scroll = self.driver.execute_script('return document.documentElement.scrollTop')
-        self.driver.execute_script(f'scrollTo(0, {scroll + y})')
+        scroll = self.driver.execute_script("return document.documentElement.scrollTop")
+        self.driver.execute_script(f"scrollTo(0, {scroll + y})")
 
     def get_current_window(self):
         return self.driver.current_window_handle
@@ -511,18 +515,18 @@ class SeleniumBot:
             actions.perform()
             time.sleep(move_timeout)
 
-            if os.name == 'posix':
+            if os.name == "posix":
                 actions.key_down(Keys.COMMAND, element).click(element).key_up(Keys.COMMAND, element)
             else:
                 actions.key_down(Keys.CONTROL).click(element).key_up(Keys.CONTROL)
             actions.perform()
             return True
-        except:
+        except Exception:
             return False
 
     def random_sleep(self, *args, **kwargs):
 
-        if kwargs.get('long'):
+        if kwargs.get("long"):
             time.sleep(random.uniform(self.MIN_RAND_LONG, self.MAX_RAND_LONG))
 
         elif len(args) == 1:
@@ -537,26 +541,26 @@ class SeleniumBot:
     def log(self, screenshot=False, error=None):
         try:
             timestamp = str(int(time.time()))
-            filename = os.path.join('log', timestamp)
-            output = ''
+            filename = os.path.join("log", timestamp)
+            output = ""
 
-            if not os.path.exists('log'):
-                os.mkdir('log')
+            if not os.path.exists("log"):
+                os.mkdir("log")
 
-            output += str(self.driver.current_url) + '\n\n'
+            output += str(self.driver.current_url) + "\n\n"
 
             if screenshot:
-                self.save_screenshot(f'{filename}.png')
+                self.save_screenshot(f"{filename}.png")
 
             if error:
-                output += f'{error}\n\n'
+                output += f"{error}\n\n"
 
             output += str(self.driver.page_source)
 
-            soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-            output += str(soup.prettify()) + '\n\n'
+            soup = BeautifulSoup(self.driver.page_source, "html.parser")
+            output += str(soup.prettify()) + "\n\n"
 
-            with open(f'{filename}.log', 'w', encoding='utf8') as f:
+            with open(f"{filename}.log", "w", encoding="utf8") as f:
                 f.write(output)
 
         except Exception as e:
@@ -577,6 +581,5 @@ class SeleniumBot:
 
     def scroll_to_bottom(self, times=1):
         for _ in range(times):
-            self.xpath('//body').send_keys(Keys.END)
+            self.xpath("//body").send_keys(Keys.END)
             self.random_sleep()
-

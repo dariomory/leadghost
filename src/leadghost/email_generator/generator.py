@@ -12,21 +12,21 @@ def generate_emails(first_name, last_name, domain):
         first_name = name_in_a_list[0].lower()
         first_initial = first_name[0]
         middle_name = name_in_a_list[1].lower()
-        middle_initial = middle_name[0]
+        middle_name[0]
         last_name = name_in_a_list[2].lower()
         last_initial = last_name[0]
 
     return [
-        first_name + '@' + domain,
-        last_name + '@' + domain,
-        first_name + last_name + '@' + domain,
-        first_name + '.' + last_name + '@' + domain,
-        first_initial + last_name + '@' + domain,
-        first_initial + '.' + last_name + '@' + domain,
-        first_name + last_initial + '@' + domain,
-        first_name + '.' + last_initial + '@' + domain,
-        first_initial + last_initial + '@' + domain,
-        first_initial + '.' + last_initial + '@' + domain,
+        first_name + "@" + domain,
+        last_name + "@" + domain,
+        first_name + last_name + "@" + domain,
+        first_name + "." + last_name + "@" + domain,
+        first_initial + last_name + "@" + domain,
+        first_initial + "." + last_name + "@" + domain,
+        first_name + last_initial + "@" + domain,
+        first_name + "." + last_initial + "@" + domain,
+        first_initial + last_initial + "@" + domain,
+        first_initial + "." + last_initial + "@" + domain,
         # last_name + first_name + '@' + domain,
         # last_name + '.' + first_name + '@' + domain,
         # last_name + first_initial + '@' + domain,
