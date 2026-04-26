@@ -35,6 +35,10 @@ Or install with [uv](https://github.com/astral-sh/uv):
 uv pip install leadghost
 ```
 
+### Windows (standalone)
+
+Each [GitHub release](https://github.com/dariomory/leadghost/releases) includes a **Windows x64** build: `leadghost.exe`. Download it, place a copy of the files from [`examples/`](examples/) in the same folder (rename or edit as needed: `config.txt`, `blacklist.txt`, `posting_history.json`, and optional `auto.csv`), then run `leadghost.exe` from that folder. Chrome must be installed; chromedriver is handled at runtime.
+
 ## Usage
 
 ### Quick Start
