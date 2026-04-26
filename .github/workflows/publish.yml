@@ -30,7 +30,7 @@ jobs:
       - name: Upload distribution
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          name: dist
+          name: python-distributions
           path: dist/
 
   publish:
@@ -47,8 +47,25 @@ jobs:
       - name: Download distribution
         uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
-          name: dist
+          name: python-distributions
           path: dist/
+
+      - name: Keep only sdist and wheel
+        run: |
+          shopt -s nullglob
+          mkdir -p /tmp/good
+          for f in dist/*.whl dist/*.tar.gz; do
+            if [[ -f "$f" ]]; then cp -a "$f" /tmp/good/; fi
+          done
+          rm -rf dist
+          mkdir -p dist
+          if compgen -G "/tmp/good/*" > /dev/null; then
+            cp -a /tmp/good/* dist/
+          else
+            echo "No .whl or .tar.gz in dist after download" >&2
+            exit 1
+          fi
+          ls -la dist/
 
       - name: Attest build provenance
         uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
@@ -57,3 +74,37 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+
+  windows-exe:
+    name: Windows executable
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+        with:
+          enable-cache: false
+
+      - name: Install dependencies
+        run: uv sync --group build
+
+      - name: PyInstaller
+        run: uv run pyinstaller packaging/leadghost.spec
+
+      - name: Upload to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -eux
+          tag="${{ github.ref_name }}"
+          test -f "dist/leadghost.exe"
+          if gh release view "$tag" 2>/dev/null; then
+            gh release upload "$tag" "dist/leadghost.exe" --clobber
+          else
+            gh release create "$tag" "dist/leadghost.exe" --title "$tag" --generate-notes
+          fi

@@ -44,6 +44,9 @@ dev = [
     { include-group = "test" },
     { include-group = "typecheck" },
 ]
+build = [
+    "pyinstaller>=6.0",
+]
 lint = [
     "ruff",
 ]
@@ -68,6 +71,8 @@ leadghost = "leadghost.cli:app"
 line-length = 120
 
 [tool.ruff.lint]
+per-file-ignores = {"packaging/*.spec" = ["F821"]}
+
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
