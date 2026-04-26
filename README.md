@@ -2,6 +2,7 @@
 
 # LeadGhost
 
+[![CI](https://github.com/dariomory/leadghost/actions/workflows/ci.yml/badge.svg)](https://github.com/dariomory/leadghost/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/leadghost.svg)](https://pypi.org/project/leadghost/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
